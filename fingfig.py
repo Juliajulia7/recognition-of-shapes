@@ -1,46 +1,69 @@
 from PIL import Image, ImageDraw #Подключим необходимые библиотеки.
 
 
-image = Image.open("1.bmp") #Открываем изображение.
+image = Image.open("triangle3.bmp") #Открываем изображение.
 image=image.convert('RGB')
-draw = ImageDraw.Draw(image) #Создаем инструмент для рисования.
 width = image.size[0] #Определяем ширину.
 height = image.size[1] #Определяем высоту.
 pix = image.load() #Выгружаем значения пикселей.
 
-#маски углов в прямоугольнике
-rec1=[[255,255,255],[255,0,0],[255,0,255]]
+#маски углов
+rec1=[[255,255,255],[0,0,255],[255,0,255]]
 rec2=[[255,255,255],[0,0,255],[255,0,255]]
 rec3=[[255,0,255],[0,0,255],[255,255,255]]
 rec4=[[255,0,255],[255,0,0],[255,255,255]]
+rec5=[[255, 255, 255], [255, 0, 255], [255, 0, 0]]
+rec6=[[0, 255, 255], [0, 0, 255], [255, 255, 255]]
+rec7=[[255, 0, 0], [255, 0, 255], [255, 255, 255]]
+rec8=[[255, 0, 255], [255, 0, 0], [255, 255, 255]]
+rec9=[[255, 255, 255], [255, 0, 0], [255, 255, 0]]
+rec10=[[255, 0, 0], [255, 255, 0], [255, 255, 255]]
+rec11=[[0, 0, 255], [255, 0, 255], [255, 255, 255]]
+rec12=[[0, 0, 255], [0, 255, 255], [255, 255, 255]]
+rec13=[[255, 255, 255], [255, 0, 0], [255, 0, 255]]
+rec14=[[255, 255, 255], [255, 0, 0], [255, 0, 255]]
+rec15=[[255, 255, 255], [0, 255, 255], [0, 0, 255]]
+rec16=[[255, 255, 255], [255, 255, 0], [255, 0, 0]]
+
 
 #вычисление значений соседних пикселей
 def findNeighbors(l,m):
 	a = [[0] * 3 for i in range(3)]
 	for i in range(3):
 		for j in range(3):
-			a[i][j]=pix[j+m-1,i+l-1][0]
-	print(a)
+			if (j+m-1<0) or (j+m-1>width-1) or (i+l-1<0) or (i+l-1>height-1): #если окрашенный пиксель крайний, то не существующие пиксели считаем = 255
+				a[i][j]=255
+			else:
+				a[i][j]=pix[j+m-1,i+l-1][0]
 	return a
 
 
 # функция для поиска первого черного пикселя
-def findBlack(): #
-	for i in range(width):
-		for j in range(height):
-			if (pix[i,j]==(0,0,0)):
-				return i,j
+
 
 def findFig():
 	count=0
-	for i in range(width):
-		for j in range(height):
-			if(pix[i, j] == (0, 0, 0)):
+	rect=0
+	blackCount=0
+	for i in range(height):
+		for j in range(width):
+			if(pix[j, i] == (0, 0, 0)):
+				blackCount = blackCount+1
 				a=findNeighbors(i,j)
-				if (findNeighbors(i,j) in (rec1,rec2,rec3,rec4)):
+				count0=list(zip(*a))[0].count(0)+list(zip(*a))[1].count(0)+list(zip(*a))[2].count(0) #число закрашенных пикселей в матр а
+				if (a in (rec1,rec2,rec3,rec4,rec5,rec6, rec7, rec8, rec9, rec10, rec11, rec12, rec13,rec14, rec15, rec16)): #проверяем угол ли матр а
+					rect=rect+1
 					count=count+1
-	if (count==4):
+				elif (count0>2): #проверяем что в фигуре нет разрывов, чтобы потом потом понять эллипс это или линия
+						count=count+1
+	if (rect==4):
 		print("прямоугольник")
+	if (rect==0 and count == blackCount): #эллипс не имеет углов и разрывов
+		print("эллипс")
+	if (rect==0 and count == blackCount-2): #линия не имеет углов и имеет 2 крайних пикселя
+		print("линия")
+	if (rect==3):
+		print("треугольник")
 
 
 
